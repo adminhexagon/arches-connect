@@ -22,7 +22,10 @@ export function PipelinePanel() {
             <span className="dot" aria-hidden="true" /> Pipeline
           </p>
           <h1>People worth a move</h1>
-          <p className="lede-sm">{DEMO_NOTICE}</p>
+          <p className="lede-sm">
+            Investor outreach is the primary path — stage, check size, thesis, and a warm intro. Lead generation and
+            resellers use the same stages. {DEMO_NOTICE}
+          </p>
         </div>
       </header>
 
@@ -81,6 +84,26 @@ export function PipelinePanel() {
                       <span className={`badge badge-${opportunity.stage}`}>{STAGE_LABEL[opportunity.stage]}</span>
                     </header>
                     <p>{opportunity.whyNow}</p>
+                    {person.investment ? (
+                      <dl className="fit-facts fit-facts-compact">
+                        <div>
+                          <dt>Stage</dt>
+                          <dd>{person.investment.stage}</dd>
+                        </div>
+                        <div>
+                          <dt>Check</dt>
+                          <dd>{person.investment.checkSize}</dd>
+                        </div>
+                        <div>
+                          <dt>Thesis</dt>
+                          <dd>{person.investment.thesis}</dd>
+                        </div>
+                        <div>
+                          <dt>Geography</dt>
+                          <dd>{person.investment.geography}</dd>
+                        </div>
+                      </dl>
+                    ) : null}
                     <p className="warm-inline">
                       <strong>Warm path:</strong> {opportunity.mutual} · {opportunity.relationship}
                     </p>

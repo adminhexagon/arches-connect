@@ -1,15 +1,40 @@
-import type { DemoPerson } from '../types'
+import type { DemoPerson, ObjectiveKind } from '../types'
 
 export const WELCOME_TEXT =
-  "What are you trying to achieve? Raise, win customers, find a partner or advisor, hire a provider — or say it in your own words."
+  "What are you trying to achieve? Investors are the place to start — VCs, angels, and funds. Lead generation and resellers are here when the objective changes."
 
-export function contextPrompt(title: string): string {
-  return `${title} is the objective. I'll work that — not just answer it.
+export function contextPrompt(title: string, kind: ObjectiveKind): string {
+  const lead = `${title} is the objective. I'll work that — not just answer it.`
+  if (kind === 'investors') {
+    return `${lead}
+
+What should I know so the fit is real? Share the stage, the check size you're raising, the thesis, and where the round should land.`
+  }
+  if (kind === 'leads') {
+    return `${lead}
+
+Who is the buyer, and what pain is current enough that a meeting has a point?`
+  }
+  if (kind === 'resellers') {
+    return `${lead}
+
+What would a reseller carry, and which buyers already ask for it?`
+  }
+  return `${lead}
 
 What should I know so the fit is real? Share what you offer, and who has a reason to care right now.`
 }
 
-export function timingPrompt(): string {
+export function timingPrompt(kind: ObjectiveKind): string {
+  if (kind === 'investors') {
+    return 'When does this need to move? This month, this quarter, or when the story is tighter is enough.'
+  }
+  if (kind === 'leads') {
+    return 'When does the buyer need to move? A week, this quarter, or before their next planning cycle is enough.'
+  }
+  if (kind === 'resellers') {
+    return 'When does the channel need to move? This month, this quarter, or when a joint customer is real is enough.'
+  }
   return 'When does this need to move? A week, this quarter, or whenever the right person shows up is enough.'
 }
 
@@ -17,7 +42,10 @@ export function proposalPrompt(person: DemoPerson, broadened: boolean): string {
   const opener = broadened
     ? `Nothing in the demo graph matches that wording closely, so I used the strongest general fit instead of inventing someone. That's ${person.name}.`
     : `I looked through the demo graph — fictional people, not a live network — and qualified ${person.name}.`
-  return `${opener}
+  const fit = person.investment
+    ? ` Stage ${person.investment.stage}. Checks ${person.investment.checkSize}. Thesis: ${person.investment.thesis}. Geography: ${person.investment.geography}.`
+    : ''
+  return `${opener}${fit}
 
 ${person.whyNow}
 
@@ -25,9 +53,12 @@ The intro needs your approval. Nothing is emailed from this preview.`
 }
 
 export function approvedPrompt(person: DemoPerson): string {
+  const ask = person.investment
+    ? `ask ${person.warmPath.mutual} for a warm intro to ${person.name} about the round`
+    : `ask ${person.warmPath.mutual} for a warm intro to ${person.name}`
   return `Approved. ${person.name} is now Approved on your pipeline.
 
-Next move: ask ${person.warmPath.mutual} for a warm intro to ${person.name}. The note stays on the card. Nothing was emailed.`
+Next move: ${ask}. The note stays on the card. Nothing was emailed.`
 }
 
 export function rejectedPrompt(name: string, next: DemoPerson | null, weak: boolean): string {
@@ -55,7 +86,7 @@ export function donePrompt(title: string): string {
 }
 
 export function newObjectivePrompt(): string {
-  return 'What are you trying to achieve next? The objective you already set stays on the list.'
+  return 'What are you trying to achieve next? Investors are still the strongest path. Lead generation and resellers are here too. The objective you already set stays on the list.'
 }
 
 export function noteReply(): string {

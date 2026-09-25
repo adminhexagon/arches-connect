@@ -1,10 +1,11 @@
-export type ObjectiveKind =
-  | 'raise'
-  | 'customers'
-  | 'partners'
-  | 'advisors'
-  | 'provider'
-  | 'custom'
+export type ObjectiveKind = 'investors' | 'leads' | 'resellers' | 'custom'
+
+export interface InvestmentProfile {
+  stage: string
+  checkSize: string
+  thesis: string
+  geography: string
+}
 
 export type ObjectiveStatus = 'active' | 'paused' | 'done'
 
@@ -49,6 +50,7 @@ export interface DemoPerson {
   fitForThem: string
   warmPath: WarmPath
   tags: string[]
+  investment?: InvestmentProfile
 }
 
 export interface Activity {
@@ -123,11 +125,9 @@ export const STAGES: PipelineStage[] = [
 ]
 
 export const KIND_LABEL: Record<ObjectiveKind, string> = {
-  raise: 'Raise',
-  customers: 'Customers',
-  partners: 'Partners',
-  advisors: 'Advisors',
-  provider: 'Provider',
+  investors: 'Investors',
+  leads: 'Lead generation',
+  resellers: 'Resellers',
   custom: 'Custom',
 }
 

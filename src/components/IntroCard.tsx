@@ -55,6 +55,27 @@ export function IntroCard({
 
         <p className="why-now">{opportunity.whyNow || person.whyNow}</p>
 
+        {person.investment ? (
+          <dl className="fit-facts">
+            <div>
+              <dt>Stage</dt>
+              <dd>{person.investment.stage}</dd>
+            </div>
+            <div>
+              <dt>Check size</dt>
+              <dd>{person.investment.checkSize}</dd>
+            </div>
+            <div>
+              <dt>Thesis</dt>
+              <dd>{person.investment.thesis}</dd>
+            </div>
+            <div>
+              <dt>Geography</dt>
+              <dd>{person.investment.geography}</dd>
+            </div>
+          </dl>
+        ) : null}
+
         <div className="reasons">
           <section>
             <h4>Why you should meet</h4>

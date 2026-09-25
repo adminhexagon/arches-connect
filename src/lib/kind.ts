@@ -4,22 +4,34 @@ export interface ObjectiveChip {
   kind: ObjectiveKind
   title: string
   hint: string
+  primary?: boolean
 }
 
 export const OBJECTIVE_CHIPS: ObjectiveChip[] = [
-  { kind: 'raise', title: 'Raise a round', hint: 'Investors actually taking meetings' },
-  { kind: 'customers', title: 'Win customers', hint: 'Buyers with a current reason' },
-  { kind: 'partners', title: 'Find a partner', hint: 'A channel or build partner' },
-  { kind: 'advisors', title: 'Find an advisor', hint: 'Someone who should be close' },
-  { kind: 'provider', title: 'Hire a provider', hint: 'A specialist worth introducing' },
+  {
+    kind: 'investors',
+    title: 'Meet investors',
+    hint: 'VCs, angels, and funds taking meetings',
+    primary: true,
+  },
+  {
+    kind: 'leads',
+    title: 'Lead generation',
+    hint: 'Buyers with a current reason to meet',
+  },
+  {
+    kind: 'resellers',
+    title: 'Resellers',
+    hint: 'Channel partners who can carry the offer',
+  },
 ]
 
 export function inferKind(title: string): ObjectiveKind {
   const text = title.toLowerCase()
-  if (/\b(raise|fundraising|fundraise|investor|seed round|series [a-c])\b/.test(text)) return 'raise'
-  if (/\b(advisor|adviser|mentor)\b/.test(text)) return 'advisors'
-  if (/\b(partner|partnership|co-sell|channel)\b/.test(text)) return 'partners'
-  if (/\b(hire|provider|agency|freelancer|vendor|contractor)\b/.test(text)) return 'provider'
-  if (/\b(customer|customers|client|clients|buyer|pipeline|logos)\b/.test(text)) return 'customers'
+  if (/\b(investor|investors|vc|vcs|venture|angel|angels|fund|funds|fundraising|fundraise|raise|seed round|pre-seed|series [a-c])\b/.test(text)) {
+    return 'investors'
+  }
+  if (/\b(reseller|resellers|channel|distributor|var)\b/.test(text)) return 'resellers'
+  if (/\b(lead|leads|customer|customers|client|clients|buyer|buyers|prospect|pipeline)\b/.test(text)) return 'leads'
   return 'custom'
 }

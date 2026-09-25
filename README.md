@@ -1,8 +1,10 @@
 # Arches Connect
 
-Connect is an objective-led outreach workspace. You give it a business objective, it interviews you for context, qualifies people from a **fictional demo graph**, drafts a warm intro, and waits for approval before anything is treated as sent.
+Connect is an objective-led outreach workspace. **Investor outreach is the primary path** — VCs, angels, and funds, matched on stage, check size, thesis, geography, and a warm path. Lead generation and resellers are available when the objective changes.
 
-This preview does not access a live relationship network and does not send email.
+You give it that objective, it interviews you for context, qualifies people from a **fictional demo graph**, drafts a warm intro, and waits for approval before anything is treated as sent.
+
+This preview does not access a live relationship network and does not send email. Demo people are labeled as demo.
 
 ## Run locally
 
@@ -26,7 +28,7 @@ npm run preview
 ## Product path
 
 1. Landing → **Hire Connect** or **Start chat**.
-2. Tell Connect the objective (chip or your own words). Blank or symbol-only objectives are rejected.
+2. Tell Connect the objective. **Meet investors** is the default chip. Lead generation and Resellers are secondary. Blank or symbol-only objectives are rejected.
 3. Answer the context and timing questions.
 4. Review the intro card: why both sides should meet, the warm path, and the draft.
 5. **Approve intro**, **Edit intro**, or **Reject intro**. Approval updates the pipeline and shows the next move. It does not email anyone.

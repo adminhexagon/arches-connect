@@ -8,16 +8,16 @@ import { StorageBanner } from './StorageBanner'
 
 const sampleObjective: Objective = {
   id: 'sample-obj',
-  title: 'Win customers',
-  kind: 'customers',
+  title: 'Meet investors',
+  kind: 'investors',
   status: 'active',
-  context: 'A billing API for logistics operators',
+  context: 'Seed round for operator-led infrastructure',
   timing: 'This quarter',
   createdAt: '2026-03-01T00:00:00.000Z',
 }
 
 function sampleOpportunity(): Opportunity | null {
-  const person = getPerson('lena-voss')
+  const person = getPerson('maya-chen')
   if (!person) return null
   return {
     id: 'sample-opp',
@@ -42,12 +42,12 @@ const STEPS = [
   {
     n: '01',
     title: 'Set the objective',
-    body: 'Raise, win customers, find a partner or advisor, hire a provider — or write your own.',
+    body: 'Investors first — VCs, angels, and funds. Lead generation and resellers are here when that is the job.',
   },
   {
     n: '02',
     title: 'Give the context',
-    body: 'What you offer, who should care, and when it needs to move. Connect will not guess a private network.',
+    body: 'Stage, check size, thesis, and geography for a raise. For buyers or resellers, the current reason to meet.',
   },
   {
     n: '03',
@@ -138,15 +138,15 @@ export function Landing() {
         <section className="hero">
           <div className="hero-copy">
             <p className="eyebrow">
-              <span className="dot" aria-hidden="true" /> Objective-led outreach
+              <span className="dot" aria-hidden="true" /> Investor outreach first
             </p>
             <h1>
-              Give Connect the objective.
-              <em> It works the relationship.</em>
+              Meet the investors who should take the meeting.
+              <em> Then work the relationship.</em>
             </h1>
             <p className="lede">
-              Raise, win customers, find a partner or advisor, hire a provider. Connect interviews you, qualifies who has a
-              reason to meet now, and drafts the warm intro. You approve every move.
+              Connect starts with VCs, angels, and funds: stage, check size, thesis, geography, and a warm path you can
+              explain. Lead generation and resellers stay available when the objective changes. You approve every move.
             </p>
             <div className="hero-actions">
               <Link to="/app/chat" className="btn btn-primary">
@@ -174,10 +174,10 @@ export function Landing() {
               </div>
             </div>
             <p className="mini-agent">What are you trying to achieve?</p>
-            <p className="mini-user">Win customers in logistics this quarter.</p>
+            <p className="mini-user">Meet seed investors for an infrastructure round.</p>
             <p className="mini-agent">
-              Harborline is replacing its billing stack. The warm path is Sam Ortiz, a customer who used to work with Lena
-              Voss. I drafted the ask. It waits for your approval.
+              Northline is taking seed meetings this quarter. Maya Chen writes $1–3M checks into operator-led
+              infrastructure. The warm path is Jordan Hale. I drafted the ask. It waits for your approval.
             </p>
             <p className="mini-note">Nothing in this preview is emailed.</p>
           </aside>
@@ -269,10 +269,28 @@ export function Landing() {
             </p>
             <h2>The intro does not move until you say so.</h2>
             <p className="lede-sm">
-              A sample from the demo graph. Lena, Sam, and Harborline are fictional. Hiring Connect starts a fresh
-              workspace in this browser.
+              A sample from the demo graph. Maya, Jordan, and Northline are fictional. Hiring Connect starts a fresh
+              workspace in this browser. Investor outreach is the primary path.
             </p>
           </div>
+          <ul className="fact-strip" aria-label="What investor matching uses">
+            <li>
+              <span>Stage</span>
+              <strong>Seed</strong>
+            </li>
+            <li>
+              <span>Check size</span>
+              <strong>$1–3M</strong>
+            </li>
+            <li>
+              <span>Thesis</span>
+              <strong>Infrastructure</strong>
+            </li>
+            <li>
+              <span>Warm path</span>
+              <strong>Jordan Hale</strong>
+            </li>
+          </ul>
           {sample ? <IntroCard opportunity={sample} mode="sample" /> : null}
         </section>
 
@@ -280,7 +298,7 @@ export function Landing() {
           <p className="eyebrow">
             <span className="dot" aria-hidden="true" /> Start
           </p>
-          <h2>Tell Connect what you’re trying to achieve.</h2>
+          <h2>Tell Connect which investors should take the meeting.</h2>
           <p>No account. No credit card. The demo stays on this device.</p>
           <div className="hero-actions">
             <Link to="/app/chat" className="btn btn-primary">

@@ -90,11 +90,19 @@ export function ChatPanel() {
 
   const placeholder =
     state.phase === 'awaiting_objective'
-      ? "Tell Connect what you're trying to achieve"
+      ? 'Meet investors, or describe the raise'
       : state.phase === 'awaiting_context'
-        ? 'What you offer, and who should care'
+        ? active?.kind === 'leads'
+          ? 'The buyer, and the pain that is current'
+          : active?.kind === 'resellers'
+            ? 'What a reseller would carry'
+            : active?.kind === 'custom'
+              ? 'What you offer, and who should care'
+              : 'Stage, check size, thesis, and geography'
         : state.phase === 'awaiting_timing'
-          ? 'When this needs to move'
+          ? active?.kind === 'investors'
+            ? 'This month, this quarter, or when the story is tighter'
+            : 'When this needs to move'
           : 'Ask for another pass, or start a new objective'
 
   return (
@@ -105,7 +113,7 @@ export function ChatPanel() {
             <p className="agent-name">
               <Logo size={22} /> Connect
             </p>
-            <p className="muted">Relationship work · simulated preview</p>
+            <p className="muted">Investor outreach first · simulated preview</p>
           </div>
           {state.phase !== 'awaiting_objective' ? (
             <button type="button" className="btn btn-secondary btn-small" onClick={() => dispatch({ type: 'start_new_objective' })}>
@@ -138,13 +146,14 @@ export function ChatPanel() {
                 <button
                   key={chip.kind}
                   type="button"
-                  className="chip"
+                  className={chip.primary ? 'chip chip-primary' : 'chip'}
                   onClick={() => {
                     setError(null)
                     setText('')
                     dispatch({ type: 'submit_objective', title: chip.title, kind: chip.kind })
                   }}
                 >
+                  {chip.primary ? <em className="chip-kicker">Primary</em> : null}
                   <span>{chip.title}</span>
                   <small>{chip.hint}</small>
                 </button>
@@ -199,7 +208,7 @@ export function ChatPanel() {
         ) : (
           <>
             <h2>No objective yet</h2>
-            <p className="muted">Start with what you’re trying to achieve. Connect will ask for context before it qualifies anyone.</p>
+            <p className="muted">Start with investors — VCs, angels, and funds. Connect will ask for stage, check size, and thesis before it qualifies anyone.</p>
           </>
         )}
         <div className="aside-memory">

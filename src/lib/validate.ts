@@ -4,10 +4,10 @@ const DETAIL_MAX = 600
 export function validateObjectiveTitle(title: string): string | null {
   const trimmed = title.trim()
   if (!trimmed) {
-    return "Add an objective first. Say what you're trying to achieve — for example, win customers."
+    return "Add an objective first. Say what you're trying to achieve — for example, meet investors."
   }
   if (trimmed.length < 3 || !/[a-z0-9]/i.test(trimmed)) {
-    return 'That objective is too thin. Use a few real words, like “raise a seed round” or “win customers”.'
+    return 'That objective is too thin. Use a few real words, like “raise a seed round” or “meet investors”.'
   }
   if (trimmed.length > OBJECTIVE_MAX) {
     return `Keep the objective under ${OBJECTIVE_MAX} characters. You can add detail in the next step.`

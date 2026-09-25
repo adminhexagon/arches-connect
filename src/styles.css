@@ -483,9 +483,51 @@ h1, .hero h1 {
   gap: 2px;
   min-width: 160px;
 }
+.chip-primary {
+  flex: 1 1 100%;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #fff 0%, #f3eeff 52%, #fff3ea 100%);
+  border-color: rgba(92, 70, 240, 0.38);
+  box-shadow: 0 10px 28px rgba(61, 42, 134, 0.08);
+}
+.chip-kicker {
+  font-style: normal;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--copper);
+  font-weight: 600;
+}
 .chip span { font-weight: 600; }
 .chip small { color: var(--muted); font-size: 12px; }
 .chip:hover { border-color: rgba(92, 70, 240, 0.45); }
+.chip-primary:hover { border-color: var(--violet); }
+
+.fact-strip {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 0;
+  margin: 18px 0 0;
+  max-width: 760px;
+}
+.fact-strip li {
+  background: rgba(255, 252, 248, 0.82);
+  border: 1px solid rgba(28, 25, 22, 0.08);
+  border-radius: 16px;
+  padding: 12px 14px;
+  display: grid;
+  gap: 4px;
+}
+.fact-strip span {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+.fact-strip strong { font-size: 16px; letter-spacing: -0.02em; }
 
 .composer {
   flex: none;
@@ -643,6 +685,31 @@ h1, .hero h1 {
 .badge-closed { background: #eceae7; color: var(--ink); }
 .badge-nurture { background: #f7efe6; color: #6d4b2c; }
 .why-now { font-size: 15px; }
+.fit-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+.fit-facts div {
+  background: #faf7f3;
+  border-radius: 14px;
+  padding: 10px 12px;
+  min-width: 0;
+}
+.fit-facts dt {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.fit-facts dd {
+  margin: 4px 0 0;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+}
+.fit-facts-compact dd { font-size: 13px; }
 .reasons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .reasons section, .warm-path, .draft-block, .next-move {
   background: #faf7f3;
@@ -694,7 +761,7 @@ h1, .hero h1 {
   .hero, .steps, .compare { grid-template-columns: 1fr; }
   .chat-aside { display: none; }
   .chat-main { border-right: 0; }
-  .reasons { grid-template-columns: 1fr; }
+  .reasons, .fit-facts, .fact-strip { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 720px) {
@@ -710,6 +777,8 @@ h1, .hero h1 {
   .tabs { width: 100%; margin-left: 0; }
   .tab { flex: 1; justify-content: center; padding: 0 8px; }
   .chip { min-width: 0; flex: 1 1 calc(50% - 8px); }
+  .chip-primary { flex-basis: 100%; }
+  .fact-strip { grid-template-columns: 1fr 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {

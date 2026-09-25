@@ -45,7 +45,7 @@ export function ObjectivesPanel() {
             id="new-objective"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
-            placeholder="Find a design partner for the climate API"
+            placeholder="Meet seed investors for an infrastructure round"
             aria-invalid={error ? true : undefined}
             aria-describedby={error ? 'objective-error' : undefined}
           />

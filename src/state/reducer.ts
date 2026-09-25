@@ -2,7 +2,7 @@ import { getPerson } from '../data/network'
 import { draftFollowUp, draftIntro } from '../lib/draft'
 import { now, uid } from '../lib/ids'
 import { inferKind } from '../lib/kind'
-import { matchPeople, stageForRank } from '../lib/match'
+import { matchPeople, qualifyLimit, stageForRank } from '../lib/match'
 import {
   WELCOME_TEXT,
   approvedPrompt,
@@ -165,7 +165,7 @@ function makeOpportunity(
 
 function qualify(data: AppData, objective: Objective): AppData {
   const { people, broadened } = matchPeople(objective)
-  const opportunities = people.slice(0, 3).map((person, index) =>
+  const opportunities = people.slice(0, qualifyLimit(objective.kind)).map((person, index) =>
     makeOpportunity(person, objective, stageForRank(index, person)),
   )
   const lead = people[0]
@@ -177,7 +177,7 @@ function qualify(data: AppData, objective: Objective): AppData {
         ...data.messages,
         message(
           'agent',
-          'I couldn’t qualify anyone from the demo graph for that objective. Try a more specific one — raise, customers, a partner, an advisor, or a provider.',
+          'I couldn’t qualify anyone from the demo graph for that objective. Try investors, lead generation, or resellers — or say it in your own words.',
         ),
       ],
     }
@@ -227,7 +227,7 @@ function beginObjective(data: AppData, title: string, kind: ObjectiveKind): AppD
     activeObjectiveId: objective.id,
     phase: 'awaiting_context',
     objectives: [objective, ...data.objectives],
-    messages: [...data.messages, message('user', title), message('agent', contextPrompt(title))],
+    messages: [...data.messages, message('user', title), message('agent', contextPrompt(title, kind))],
   })
 }
 
@@ -252,7 +252,7 @@ export function reducer(state: AppData, action: Action): AppData {
         ...state,
         phase: 'awaiting_timing',
         objectives: state.objectives.map((item) => (item.id === updated.id ? updated : item)),
-        messages: [...state.messages, message('user', text), message('agent', timingPrompt())],
+        messages: [...state.messages, message('user', text), message('agent', timingPrompt(updated.kind))],
         memory: learnPreferences(state.memory, text),
       }
       return syncSummary(next)

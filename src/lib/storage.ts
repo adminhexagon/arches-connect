@@ -1,4 +1,4 @@
-import type { AppData, Memory, Phase } from '../types'
+import type { AppData, Memory, ObjectiveKind, Phase } from '../types'
 
 export const STORAGE_KEY = 'arches-connect.v1'
 
@@ -9,6 +9,23 @@ export const WRITE_ERROR =
   "Couldn't save to this browser. Your latest changes stay in this tab only."
 
 const PHASES: Phase[] = ['awaiting_objective', 'awaiting_context', 'awaiting_timing', 'active']
+
+const LEGACY_KIND: Record<string, ObjectiveKind> = {
+  investors: 'investors',
+  leads: 'leads',
+  resellers: 'resellers',
+  custom: 'custom',
+  raise: 'investors',
+  customers: 'leads',
+  partners: 'resellers',
+  advisors: 'custom',
+  provider: 'custom',
+}
+
+function normalizeKind(value: unknown): ObjectiveKind {
+  if (typeof value === 'string' && value in LEGACY_KIND) return LEGACY_KIND[value]
+  return 'custom'
+}
 
 function isMemory(value: unknown): value is Memory {
   if (!value || typeof value !== 'object') return false
@@ -36,6 +53,10 @@ export function isAppData(value: unknown): value is AppData {
 export function normalizeData(data: AppData): AppData {
   return {
     ...data,
+    objectives: data.objectives.map((objective) => ({
+      ...objective,
+      kind: normalizeKind(objective.kind),
+    })),
     memory: {
       objectiveSummary: data.memory.objectiveSummary ?? '',
       summaryCustom: Boolean(data.memory.summaryCustom),
