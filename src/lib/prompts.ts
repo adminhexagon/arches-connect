@@ -1,7 +1,7 @@
 import type { DemoPerson, ObjectiveKind } from '../types'
 
 export const WELCOME_TEXT =
-  "What are you trying to achieve? Investors are the place to start — VCs, angels, and funds. Lead generation and resellers are here when the objective changes."
+  "What should Connect get done for you? Investors are the place to start — VCs, angels, and funds. Clients and reseller partners are here when the objective changes."
 
 export function contextPrompt(title: string, kind: ObjectiveKind): string {
   const lead = `${title} is the objective. I'll work that — not just answer it.`

@@ -46,10 +46,10 @@ export function PipelinePanel() {
 
       {state.objectives.length === 0 ? (
         <div className="empty">
-          <h2>The pipeline is empty</h2>
-          <p>Set an objective in chat. Connect will qualify someone from the demo graph and wait for your approval.</p>
+          <h2>Nothing in your pipeline yet</h2>
+          <p>When Connect proposes an introduction, it shows up here. Nothing is emailed until you approve it.</p>
           <Link className="btn btn-primary" to="/">
-            Start chat
+            New chat
           </Link>
         </div>
       ) : visible.length === 0 ? (

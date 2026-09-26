@@ -10,18 +10,18 @@ export interface ObjectiveChip {
 export const OBJECTIVE_CHIPS: ObjectiveChip[] = [
   {
     kind: 'investors',
-    title: 'Meet investors',
-    hint: 'VCs, angels, and funds taking meetings',
+    title: "I'm looking for investors",
+    hint: 'VCs, angels, and funds',
     primary: true,
   },
   {
     kind: 'leads',
-    title: 'Lead generation',
-    hint: 'Buyers with a current reason to meet',
+    title: "I'm looking for clients",
+    hint: 'Buyers with a reason to meet',
   },
   {
     kind: 'resellers',
-    title: 'Resellers',
+    title: 'Finding reseller partners',
     hint: 'Channel partners who can carry the offer',
   },
 ]

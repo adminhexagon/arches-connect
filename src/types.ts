@@ -124,6 +124,7 @@ export interface Memory {
   summaryCustom: boolean
   preferences: string[]
   outcomes: string[]
+  corrections: string[]
 }
 
 export interface AppData {
@@ -132,6 +133,7 @@ export interface AppData {
   messages: ChatMessage[]
   searches: SearchRecord[]
   threads: PersonThread[]
+  pinnedIds: string[]
   memory: Memory
   phase: Phase
   activeObjectiveId: string | null

@@ -139,11 +139,13 @@ export function normalizeData(data: AppData): AppData {
     objectives,
     searches,
     threads,
+    pinnedIds: Array.isArray(data.pinnedIds) ? data.pinnedIds.filter((id) => typeof id === 'string') : [],
     memory: {
       objectiveSummary: data.memory.objectiveSummary ?? '',
       summaryCustom: Boolean(data.memory.summaryCustom),
       preferences: data.memory.preferences ?? [],
       outcomes: data.memory.outcomes ?? [],
+      corrections: data.memory.corrections ?? [],
     },
   }
 }

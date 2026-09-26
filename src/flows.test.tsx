@@ -17,12 +17,12 @@ async function renderAt(path: string) {
       </AppStateProvider>
     </MemoryRouter>,
   )
-  await screen.findByRole('button', { name: 'Hire Connect' })
+  await screen.findByRole('link', { name: 'New chat' })
   return view
 }
 
 async function reachIntro(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(screen.getByRole('button', { name: /meet investors/i }))
+  await user.click(screen.getByRole('button', { name: /looking for investors/i }))
   await user.type(
     screen.getByRole('textbox', { name: 'Message Connect' }),
     'Raising a seed round for infrastructure software',
@@ -38,20 +38,30 @@ describe('Arches Connect', () => {
     vi.restoreAllMocks()
   })
 
-  it('opens in the workspace and starts investor outreach with Hire Connect', async () => {
+  it('opens in the app shell and starts investor outreach', async () => {
     const user = userEvent.setup()
     await renderAt('/')
+    expect(screen.getByRole('heading', { name: /what should connect get done for you/i })).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: /investors who should take the meeting/i })).not.toBeInTheDocument()
-    expect(screen.getByRole('log', { name: /conversation with connect/i })).toHaveTextContent(/investors are the place to start/i)
-    expect(screen.getByRole('button', { name: /lead generation/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /resellers/i })).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Hire Connect' }))
-    expect(screen.getByRole('log')).toHaveTextContent(/Meet investors is the objective/i)
+    expect(screen.getByRole('link', { name: 'Chat History' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Objectives' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Pipeline' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Connectors' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Billing' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Referrals' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /looking for clients/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /reseller partners/i })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /looking for investors/i }))
+    expect(screen.getByRole('log', { name: /conversation with connect/i })).toHaveTextContent(
+      /I'm looking for investors is the objective/i,
+    )
     expect(screen.getByRole('log')).toHaveTextContent(/stage, the check size/i)
     await user.click(screen.getByRole('link', { name: 'Objectives' }))
-    expect(screen.getByRole('heading', { name: 'Meet investors' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: "I'm looking for investors" })).toBeInTheDocument()
     expect(screen.getAllByText('Investors').length).toBeGreaterThan(0)
-    expect(screen.getByRole('button', { name: 'Active', pressed: true })).toBeInTheDocument()
+    expect(screen.getByText('Being shaped')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Work on this' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^Live/ })).toBeInTheDocument()
   })
 
   it('rejects a blank or invalid objective', async () => {
@@ -93,7 +103,7 @@ describe('Arches Connect', () => {
     expect(screen.queryByText('Elena Brooks')).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('link', { name: 'Objectives' }))
-    expect(screen.getByText(/You approved the intro draft. Nothing was emailed./)).toBeInTheDocument()
+    expect(screen.getAllByText(/You approved the intro draft. Nothing was emailed./).length).toBeGreaterThan(0)
   })
 
   it('keeps a demo conversation with Maya and the saved search across remount', async () => {
@@ -113,8 +123,10 @@ describe('Arches Connect', () => {
     first.unmount()
 
     await renderAt('/')
-    expect(screen.getByRole('log', { name: /conversation with connect/i })).toHaveTextContent(/Meet investors is the objective/)
-    expect(screen.getByRole('button', { name: 'Saved search Meet investors' })).toHaveTextContent(/infrastructure software/)
+    expect(screen.getByRole('log', { name: /conversation with connect/i })).toHaveTextContent(/I'm looking for investors is the objective/)
+    expect(screen.getByRole('button', { name: "Open I'm looking for investors" })).toHaveTextContent(/infrastructure software/)
+    await user.click(screen.getByRole('link', { name: 'Chat History' }))
+    expect(screen.getByRole('heading', { name: "I'm looking for investors" })).toBeInTheDocument()
     await user.click(screen.getByRole('link', { name: /Maya Chen/ }))
     const restored = await screen.findByRole('log', { name: /conversation with maya chen/i })
     expect(restored).toHaveTextContent(/What check size fits this seed round\?/)
@@ -123,18 +135,39 @@ describe('Arches Connect', () => {
     expect(screen.getByRole('heading', { name: 'Maya Chen' })).toBeInTheDocument()
   })
 
+  it('does not mark a connector connected when Connect is clicked', async () => {
+    const user = userEvent.setup()
+    await renderAt('/connectors')
+    await user.click(screen.getByRole('button', { name: 'Connect Gmail' }))
+    expect(screen.getByRole('status')).toHaveTextContent(/nothing was connected/i)
+    expect(screen.queryByRole('button', { name: /^Connected/ })).not.toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Coming soon' }).length).toBeGreaterThan(3)
+  })
+
+  it('saves a memory correction', async () => {
+    const user = userEvent.setup()
+    await renderAt('/')
+    await user.click(screen.getByRole('button', { name: 'Memories' }))
+    await user.type(screen.getByLabelText(/something doesn’t look right/i), 'We are raising a seed round, not a Series B.')
+    await user.click(screen.getByRole('button', { name: 'Tell Connect' }))
+    expect(screen.getByText(/seed round, not a Series B/i)).toBeInTheDocument()
+    await storage.flushPersistence()
+    const saved = await storage.readState()
+    expect(JSON.stringify(saved.data?.memory.corrections ?? [])).toMatch(/seed round, not a Series B/i)
+  })
+
   it('clears the saved workspace from this browser', async () => {
     const user = userEvent.setup()
     await renderAt('/')
-    await user.click(screen.getByRole('button', { name: 'Hire Connect' }))
-    await user.click(screen.getByRole('link', { name: 'Memory' }))
+    await user.click(screen.getByRole('button', { name: /looking for investors/i }))
+    await user.click(screen.getByRole('button', { name: 'Memories' }))
     await user.click(screen.getByRole('button', { name: 'Clear preview data' }))
     await user.click(screen.getByRole('button', { name: 'Confirm clear' }))
     await user.click(screen.getByRole('link', { name: 'Objectives' }))
     expect(await screen.findByRole('heading', { name: 'No objectives yet' })).toBeInTheDocument()
     await storage.flushPersistence()
     const saved = await storage.readState()
-    expect(JSON.stringify(saved.data ?? {})).not.toContain('Meet investors')
+    expect(JSON.stringify(saved.data ?? {})).not.toContain("I'm looking for investors")
   })
 
   it('shows a visible error when saving fails', async () => {

@@ -60,6 +60,8 @@ export type Action =
   | { type: 'open_thread'; opportunityId: string }
   | { type: 'send_person_message'; threadId: string; text: string }
   | { type: 'hydrate'; data: AppData }
+  | { type: 'toggle_pin'; id: string }
+  | { type: 'add_correction'; text: string }
   | { type: 'reset' }
 
 function message(role: ChatMessage['role'], text: string, extra?: Partial<ChatMessage>): ChatMessage {
@@ -223,12 +225,14 @@ export function freshState(): AppData {
     opportunities: [],
     searches: [],
     threads: [],
+    pinnedIds: [],
     messages: [{ id: 'msg-welcome', role: 'agent', text: WELCOME_TEXT, at: now() }],
     memory: {
       objectiveSummary: '',
       summaryCustom: false,
       preferences: [],
       outcomes: [],
+      corrections: [],
     },
     phase: 'awaiting_objective',
     activeObjectiveId: null,
@@ -514,6 +518,23 @@ export function reducer(state: AppData, action: Action): AppData {
     }
     case 'use_generated_summary':
       return syncSummary({ ...state, memory: { ...state.memory, summaryCustom: false } })
+    case 'toggle_pin': {
+      const current = state.pinnedIds ?? []
+      const pinnedIds = current.includes(action.id) ? current.filter((id) => id !== action.id) : [...current, action.id]
+      return { ...state, pinnedIds }
+    }
+    case 'add_correction': {
+      if (validateDetail(action.text, 'note')) return state
+      const text = action.text.trim()
+      return {
+        ...state,
+        memory: {
+          ...state.memory,
+          corrections: [text, ...(state.memory.corrections ?? [])].slice(0, 24),
+          outcomes: [`Correction: ${text}`, ...state.memory.outcomes].slice(0, 24),
+        },
+      }
+    }
     case 'open_thread': {
       const opportunity = state.opportunities.find((item) => item.id === action.opportunityId)
       const person = opportunity ? getPerson(opportunity.personId) : undefined
