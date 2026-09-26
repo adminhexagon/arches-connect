@@ -161,7 +161,7 @@ export function MemoryPanel() {
       <section className="memory-card danger-zone">
         <h2>This browser</h2>
         <p className="muted">
-          Chat, objectives, and pipeline are saved locally. Clearing removes them from this browser. Last write{' '}
+          Searches, chats, matches, and demo threads are saved in this browser. Clearing removes them from this device. Last activity{' '}
           {state.messages.at(-1) ? formatWhen(state.messages.at(-1)!.at) : 'just now'}.
         </p>
         <button

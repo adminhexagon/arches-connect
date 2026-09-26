@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { getPerson } from '../data/network'
 import { validateDetail } from '../lib/validate'
 import { useAppState } from '../state/AppState'
+import { threadIdFor } from '../state/reducer'
 import type { Opportunity } from '../types'
 import { STAGE_LABEL } from '../types'
 import { Avatar } from './Avatar'
@@ -14,6 +16,7 @@ export function IntroCard({
   mode: 'chat' | 'pipeline' | 'sample'
 }) {
   const { dispatch } = useAppState()
+  const navigate = useNavigate()
   const person = getPerson(opportunity.personId)
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(opportunity.draft)
@@ -55,23 +58,23 @@ export function IntroCard({
 
         <p className="why-now">{opportunity.whyNow || person.whyNow}</p>
 
-        {person.investment ? (
+        {(opportunity.investment ?? person.investment) ? (
           <dl className="fit-facts">
             <div>
               <dt>Stage</dt>
-              <dd>{person.investment.stage}</dd>
+              <dd>{(opportunity.investment ?? person.investment)?.stage}</dd>
             </div>
             <div>
               <dt>Check size</dt>
-              <dd>{person.investment.checkSize}</dd>
+              <dd>{(opportunity.investment ?? person.investment)?.checkSize}</dd>
             </div>
             <div>
               <dt>Thesis</dt>
-              <dd>{person.investment.thesis}</dd>
+              <dd>{(opportunity.investment ?? person.investment)?.thesis}</dd>
             </div>
             <div>
               <dt>Geography</dt>
-              <dd>{person.investment.geography}</dd>
+              <dd>{(opportunity.investment ?? person.investment)?.geography}</dd>
             </div>
           </dl>
         ) : null}
@@ -141,9 +144,22 @@ export function IntroCard({
           </section>
         ) : null}
 
-        {mode === 'sample' ? (
+        {mode !== 'sample' ? (
+          <div className="row-actions">
+            <button
+              type="button"
+              className="btn btn-secondary btn-small"
+              onClick={() => {
+                dispatch({ type: 'open_thread', opportunityId: opportunity.id })
+                navigate(`/talk/${threadIdFor(opportunity.id)}`)
+              }}
+            >
+              Talk with {person.name}
+            </button>
+          </div>
+        ) : (
           <p className="card-caption">Sample only. Approval in the product records a decision and does not send email.</p>
-        ) : null}
+        )}
 
         {canDecide && !editing ? (
           <>

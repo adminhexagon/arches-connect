@@ -1,11 +1,12 @@
-import { useLayoutEffect, useMemo, useReducer, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useReducer, useState, type ReactNode } from 'react'
 import { createContext, useContext } from 'react'
-import { clearState, readState, writeState } from '../lib/storage'
+import * as storage from '../lib/storage'
 import { freshState, reducer, type Action } from './reducer'
 import type { AppData } from '../types'
 
 interface Store {
   state: AppData
+  ready: boolean
   storageError: string | null
   persistBlocked: boolean
   dispatch: (action: Action) => void
@@ -15,48 +16,68 @@ interface Store {
 
 const AppStateContext = createContext<Store | null>(null)
 
-function loadInitial(): { data: AppData; error: string | null; persist: boolean } {
-  const loaded = readState()
-  if (loaded.error) return { data: freshState(), error: loaded.error, persist: false }
-  if (loaded.data) return { data: loaded.data, error: null, persist: true }
-  return { data: freshState(), error: null, persist: true }
-}
-
 export function AppStateProvider({ children }: { children: ReactNode }) {
-  const [bundle] = useState(loadInitial)
-  const [state, dispatch] = useReducer(reducer, bundle.data)
-  const [storageError, setStorageError] = useState<string | null>(bundle.error)
-  const [persist, setPersist] = useState(bundle.persist)
+  const [state, dispatch] = useReducer(reducer, freshState())
+  const [ready, setReady] = useState(false)
+  const [storageError, setStorageError] = useState<string | null>(null)
+  const [persist, setPersist] = useState(true)
 
-  useLayoutEffect(() => {
-    if (!persist) return
-    const error = writeState(state)
-    setStorageError((current) => (current === error ? current : error))
-  }, [state, persist])
+  useEffect(() => {
+    let cancel = false
+    void storage.readState().then((loaded) => {
+      if (cancel) return
+      if (loaded.error) {
+        setStorageError(loaded.error)
+        setPersist(false)
+      } else if (loaded.data) {
+        dispatch({ type: 'hydrate', data: loaded.data })
+      }
+      setReady(true)
+    })
+    return () => {
+      cancel = true
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!ready || !persist) return
+    let cancel = false
+    void storage.writeState(state).then((error) => {
+      if (cancel) return
+      setStorageError((current) => {
+        if (error) return error
+        return current === storage.WRITE_ERROR ? null : current
+      })
+    })
+    return () => {
+      cancel = true
+    }
+  }, [state, ready, persist])
 
   const store = useMemo<Store>(
     () => ({
       state,
+      ready,
       storageError,
       persistBlocked: !persist,
       dispatch,
       replaceSaved: () => {
         setPersist(true)
-        const error = writeState(state)
-        setStorageError(error)
+        void storage.writeState(state).then((error) => setStorageError(error))
       },
       resetWorkspace: () => {
-        const error = clearState()
-        if (error) {
-          setStorageError(error)
-          return
-        }
-        setPersist(true)
-        setStorageError(null)
-        dispatch({ type: 'reset' })
+        void storage.clearState().then((error) => {
+          if (error) {
+            setStorageError(error)
+            return
+          }
+          setPersist(true)
+          setStorageError(null)
+          dispatch({ type: 'reset' })
+        })
       },
     }),
-    [state, storageError, persist],
+    [state, ready, storageError, persist],
   )
 
   return <AppStateContext.Provider value={store}>{children}</AppStateContext.Provider>

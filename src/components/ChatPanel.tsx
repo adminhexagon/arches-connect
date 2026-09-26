@@ -1,10 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
-import { Link } from 'react-router-dom'
-import { DEMO_NOTICE } from '../data/network'
 import { OBJECTIVE_CHIPS } from '../lib/kind'
 import { validateDetail, validateObjectiveTitle } from '../lib/validate'
 import { useAppState } from '../state/AppState'
-import { KIND_LABEL } from '../types'
 import { IntroCard } from './IntroCard'
 import { Logo } from './Logo'
 import { NextMove } from './NextMove'
@@ -16,7 +13,6 @@ export function ChatPanel() {
   const endRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const active = state.objectives.find((objective) => objective.id === state.activeObjectiveId)
-  const related = state.opportunities.filter((opportunity) => opportunity.objectiveId === active?.id)
 
   useEffect(() => {
     const node = endRef.current
@@ -113,7 +109,7 @@ export function ChatPanel() {
             <p className="agent-name">
               <Logo size={22} /> Connect
             </p>
-            <p className="muted">Investor outreach first · simulated preview</p>
+            <p className="muted">Investor outreach first · demo workspace</p>
           </div>
           {state.phase !== 'awaiting_objective' ? (
             <button type="button" className="btn btn-secondary btn-small" onClick={() => dispatch({ type: 'start_new_objective' })}>
@@ -192,33 +188,6 @@ export function ChatPanel() {
           ) : null}
         </form>
       </section>
-
-      <aside className="chat-aside" aria-label="Working context">
-        <p className="eyebrow">
-          <span className="dot" aria-hidden="true" /> Active objective
-        </p>
-        {active ? (
-          <>
-            <h2>{active.title}</h2>
-            <p className="kind-line">{KIND_LABEL[active.kind]} · {active.status}</p>
-            <p className="muted">{active.context || 'Context comes next.'}</p>
-            {active.timing ? <p className="muted">Timing: {active.timing}</p> : null}
-            <p className="count-line">{related.length} in the pipeline</p>
-          </>
-        ) : (
-          <>
-            <h2>No objective yet</h2>
-            <p className="muted">Start with investors — VCs, angels, and funds. Connect will ask for stage, check size, and thesis before it qualifies anyone.</p>
-          </>
-        )}
-        <div className="aside-memory">
-          <h3>Memory</h3>
-          <p>{state.memory.objectiveSummary || 'Notes land here as the objective takes shape.'}</p>
-          {state.memory.outcomes[0] ? <p className="muted">Last outcome: {state.memory.outcomes[0]}</p> : null}
-          <Link to="/app/memory">Open memory</Link>
-        </div>
-        <p className="demo-note">{DEMO_NOTICE}</p>
-      </aside>
     </div>
   )
 }

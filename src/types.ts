@@ -72,9 +72,42 @@ export interface Opportunity {
   shared: string
   draft: string
   followUpDraft: string
+  investment?: InvestmentProfile
   createdAt: string
   updatedAt: string
   activity: Activity[]
+}
+
+export interface SearchRecord {
+  id: string
+  objectiveId: string
+  title: string
+  kind: ObjectiveKind
+  context: string
+  timing: string
+  criteria: string
+  stage: string
+  checkSize: string
+  thesis: string
+  geography: string
+  createdAt: string
+}
+
+export interface ThreadMessage {
+  id: string
+  role: 'user' | 'person'
+  text: string
+  at: string
+}
+
+export interface PersonThread {
+  id: string
+  personId: string
+  objectiveId: string
+  opportunityId: string
+  messages: ThreadMessage[]
+  createdAt: string
+  updatedAt: string
 }
 
 export interface ChatMessage {
@@ -97,6 +130,8 @@ export interface AppData {
   objectives: Objective[]
   opportunities: Opportunity[]
   messages: ChatMessage[]
+  searches: SearchRecord[]
+  threads: PersonThread[]
   memory: Memory
   phase: Phase
   activeObjectiveId: string | null

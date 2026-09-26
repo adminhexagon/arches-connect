@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { DEMO_NOTICE, getPerson } from '../data/network'
 import { useAppState } from '../state/AppState'
+import { threadIdFor } from '../state/reducer'
 import { STAGE_LABEL, STAGES, type PipelineStage } from '../types'
 import { Avatar } from './Avatar'
 import { IntroCard } from './IntroCard'
@@ -11,6 +12,7 @@ type Filter = 'all' | PipelineStage
 
 export function PipelinePanel() {
   const { state, dispatch } = useAppState()
+  const navigate = useNavigate()
   const [filter, setFilter] = useState<Filter>('all')
   const visible = state.opportunities.filter((opportunity) => filter === 'all' || opportunity.stage === filter)
 
@@ -46,7 +48,7 @@ export function PipelinePanel() {
         <div className="empty">
           <h2>The pipeline is empty</h2>
           <p>Set an objective in chat. Connect will qualify someone from the demo graph and wait for your approval.</p>
-          <Link className="btn btn-primary" to="/app/chat">
+          <Link className="btn btn-primary" to="/">
             Start chat
           </Link>
         </div>
@@ -84,23 +86,23 @@ export function PipelinePanel() {
                       <span className={`badge badge-${opportunity.stage}`}>{STAGE_LABEL[opportunity.stage]}</span>
                     </header>
                     <p>{opportunity.whyNow}</p>
-                    {person.investment ? (
+                    {(opportunity.investment ?? person.investment) ? (
                       <dl className="fit-facts fit-facts-compact">
                         <div>
                           <dt>Stage</dt>
-                          <dd>{person.investment.stage}</dd>
+                          <dd>{(opportunity.investment ?? person.investment)?.stage}</dd>
                         </div>
                         <div>
                           <dt>Check</dt>
-                          <dd>{person.investment.checkSize}</dd>
+                          <dd>{(opportunity.investment ?? person.investment)?.checkSize}</dd>
                         </div>
                         <div>
                           <dt>Thesis</dt>
-                          <dd>{person.investment.thesis}</dd>
+                          <dd>{(opportunity.investment ?? person.investment)?.thesis}</dd>
                         </div>
                         <div>
                           <dt>Geography</dt>
-                          <dd>{person.investment.geography}</dd>
+                          <dd>{(opportunity.investment ?? person.investment)?.geography}</dd>
                         </div>
                       </dl>
                     ) : null}
@@ -108,6 +110,16 @@ export function PipelinePanel() {
                       <strong>Warm path:</strong> {opportunity.mutual} · {opportunity.relationship}
                     </p>
                     {opportunity.draft ? <pre className="draft-text">{opportunity.draft}</pre> : null}
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-small"
+                      onClick={() => {
+                        dispatch({ type: 'open_thread', opportunityId: opportunity.id })
+                        navigate(`/talk/${threadIdFor(opportunity.id)}`)
+                      }}
+                    >
+                      Talk with {person.name}
+                    </button>
                     {opportunity.stage === 'qualified' || opportunity.stage === 'researching' ? (
                       <button
                         type="button"

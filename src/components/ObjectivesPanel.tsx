@@ -64,7 +64,7 @@ export function ObjectivesPanel() {
         <div className="empty">
           <h2>No objectives yet</h2>
           <p>Tell Connect what you’re trying to achieve and it will qualify someone from the demo graph.</p>
-          <Link className="btn btn-primary" to="/app/chat">
+          <Link className="btn btn-primary" to="/">
             Start chat
           </Link>
         </div>
@@ -102,12 +102,12 @@ export function ObjectivesPanel() {
                     className="btn btn-secondary btn-small"
                     onClick={() => {
                       dispatch({ type: 'select_objective', id: objective.id })
-                      navigate('/app/chat')
+                      navigate('/')
                     }}
                   >
                     Work in chat
                   </button>
-                  <Link className="text-link" to="/app/pipeline">
+                  <Link className="text-link" to="/pipeline">
                     {linked.length} in pipeline
                   </Link>
                 </div>

@@ -3,6 +3,8 @@ import { draftFollowUp, draftIntro } from '../lib/draft'
 import { now, uid } from '../lib/ids'
 import { inferKind } from '../lib/kind'
 import { matchPeople, qualifyLimit, stageForRank } from '../lib/match'
+import { personOpening, personReply } from '../lib/personReply'
+import { buildSearch } from '../lib/search'
 import {
   WELCOME_TEXT,
   approvedPrompt,
@@ -29,6 +31,7 @@ import type {
   ObjectiveKind,
   ObjectiveStatus,
   Opportunity,
+  PersonThread,
   Phase,
   PipelineStage,
 } from '../types'
@@ -54,6 +57,9 @@ export type Action =
   | { type: 'add_outcome_note'; text: string }
   | { type: 'set_summary'; text: string }
   | { type: 'use_generated_summary' }
+  | { type: 'open_thread'; opportunityId: string }
+  | { type: 'send_person_message'; threadId: string; text: string }
+  | { type: 'hydrate'; data: AppData }
   | { type: 'reset' }
 
 function message(role: ChatMessage['role'], text: string, extra?: Partial<ChatMessage>): ChatMessage {
@@ -157,6 +163,7 @@ function makeOpportunity(
     shared: person.warmPath.shared,
     draft: proposed ? draftIntro(person, objective) : '',
     followUpDraft: draftFollowUp(person, objective),
+    investment: person.investment,
     createdAt: now(),
     updatedAt: now(),
     activity: [act('Researched the demo graph for this objective.'), act(label)],
@@ -183,13 +190,19 @@ function qualify(data: AppData, objective: Objective): AppData {
     }
   }
   const leadOpp = opportunities[0]
+  const search = buildSearch(objective)
   return syncSummary({
     ...data,
     phase: 'active',
+    searches: [search, ...data.searches.filter((item) => item.objectiveId !== objective.id)],
     opportunities: [...opportunities, ...data.opportunities],
     messages: [
       ...data.messages,
-      message('agent', proposalPrompt(lead, broadened), { opportunityId: leadOpp.id }),
+      message(
+        'agent',
+        `${proposalPrompt(lead, broadened)} You can open a demo conversation with ${lead.name} from the card. That thread is fictional and is not emailed.`,
+        { opportunityId: leadOpp.id },
+      ),
     ],
   })
 }
@@ -208,6 +221,8 @@ export function freshState(): AppData {
   return {
     objectives: [],
     opportunities: [],
+    searches: [],
+    threads: [],
     messages: [{ id: 'msg-welcome', role: 'agent', text: WELCOME_TEXT, at: now() }],
     memory: {
       objectiveSummary: '',
@@ -231,8 +246,14 @@ function beginObjective(data: AppData, title: string, kind: ObjectiveKind): AppD
   })
 }
 
+export function threadIdFor(opportunityId: string): string {
+  return `thread-${opportunityId}`
+}
+
 export function reducer(state: AppData, action: Action): AppData {
   switch (action.type) {
+    case 'hydrate':
+      return action.data
     case 'reset':
       return freshState()
     case 'submit_objective':
@@ -493,6 +514,48 @@ export function reducer(state: AppData, action: Action): AppData {
     }
     case 'use_generated_summary':
       return syncSummary({ ...state, memory: { ...state.memory, summaryCustom: false } })
+    case 'open_thread': {
+      const opportunity = state.opportunities.find((item) => item.id === action.opportunityId)
+      const person = opportunity ? getPerson(opportunity.personId) : undefined
+      if (!opportunity || !person) return state
+      const id = threadIdFor(opportunity.id)
+      if (state.threads.some((thread) => thread.id === id)) return state
+      const objective = state.objectives.find((item) => item.id === opportunity.objectiveId)
+      const thread: PersonThread = {
+        id,
+        personId: person.id,
+        objectiveId: opportunity.objectiveId,
+        opportunityId: opportunity.id,
+        createdAt: now(),
+        updatedAt: now(),
+        messages: [{ id: uid('pm'), role: 'person', text: personOpening(person, objective), at: now() }],
+      }
+      return {
+        ...state,
+        threads: [thread, ...state.threads],
+        memory: pushOutcome(state.memory, `Opened a demo conversation with ${person.name}. Not sent.`),
+      }
+    }
+    case 'send_person_message': {
+      if (validateDetail(action.text, 'message')) return state
+      const thread = state.threads.find((item) => item.id === action.threadId)
+      const person = thread ? getPerson(thread.personId) : undefined
+      if (!thread || !person) return state
+      const text = action.text.trim()
+      const updated: PersonThread = {
+        ...thread,
+        updatedAt: now(),
+        messages: [
+          ...thread.messages,
+          { id: uid('pm'), role: 'user', text, at: now() },
+          { id: uid('pm'), role: 'person', text: personReply(person, text), at: now() },
+        ],
+      }
+      return {
+        ...state,
+        threads: state.threads.map((item) => (item.id === thread.id ? updated : item)),
+      }
+    }
     default:
       return state
   }
