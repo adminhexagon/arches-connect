@@ -18,17 +18,12 @@ export function PipelinePanel() {
 
   return (
     <div className="panel-scroll">
-      <header className="panel-head">
-        <div>
-          <p className="eyebrow">
-            <span className="dot" aria-hidden="true" /> Pipeline
-          </p>
-          <h1>People worth a move</h1>
-          <p className="lede-sm">
-            Investor outreach is the primary path — stage, check size, thesis, and a warm intro. Lead generation and
-            resellers use the same stages. {DEMO_NOTICE}
-          </p>
-        </div>
+      <header className="page-head">
+        <h1>Pipeline</h1>
+        <p>
+          Every relationship Connect is working to move forward. Investor outreach is the primary path — stage, check
+          size, thesis, and a warm intro. Lead generation and resellers use the same stages. {DEMO_NOTICE}
+        </p>
       </header>
 
       <div className="pipe-filters" role="group" aria-label="Filter by stage">
@@ -45,7 +40,7 @@ export function PipelinePanel() {
       </div>
 
       {state.objectives.length === 0 ? (
-        <div className="empty">
+        <div className="empty-panel">
           <h2>Nothing in your pipeline yet</h2>
           <p>When Connect proposes an introduction, it shows up here. Nothing is emailed until you approve it.</p>
           <Link className="btn btn-primary" to="/">
@@ -53,7 +48,7 @@ export function PipelinePanel() {
           </Link>
         </div>
       ) : visible.length === 0 ? (
-        <div className="empty">
+        <div className="empty-panel">
           <h2>Nobody in this stage</h2>
           <p>
             {state.opportunities.length === 0

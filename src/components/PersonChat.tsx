@@ -34,7 +34,7 @@ export function PersonChat({ threadId }: { threadId: string }) {
     return (
       <div className="chat-layout">
         <section className="chat-main">
-          <div className="empty">
+          <div className="empty-panel">
             <h1>That conversation isn’t in this workspace</h1>
             <p>Open a match from Connect’s chat to start a demo thread.</p>
             <Link className="btn btn-primary" to="/">
